@@ -75,7 +75,7 @@ describe("## Verify the Friends Facade ##", () => {
 
   describe("Verify the getAllFriends method", () => {
     it("It should get two friends", async () => {
-        const all = await facade.getAllFriends();
+        const all = await facade.getAllFriendsV2();
         expect(all.length).to.equal(2);
     })
   })
@@ -83,11 +83,11 @@ describe("## Verify the Friends Facade ##", () => {
   describe("Verify the getFriend method", () => {
 
     it("It should find Donald Duck", async () => {
-        const donald = await facade.getFrind("dd@b.dk");
+        const donald = await facade.getFriendFromEmail("dd@b.dk");
         expect(donald.email).to.equal("dd@b.dk");
     })
     it("It should not find xxx.@.b.dk", async () => {
-        await expect(facade.getFrind("xxx.@.b.dk")).to.be.rejectedWith(ApiError);
+        await expect(facade.getFriendFromEmail("xxx.@.b.dk")).to.be.rejectedWith(ApiError);
     })
   })
 

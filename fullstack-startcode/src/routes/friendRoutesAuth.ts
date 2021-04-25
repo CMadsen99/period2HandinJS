@@ -3,6 +3,7 @@ const router = Router();
 import { ApiError } from "../errors/errors"
 import FriendFacade from "../facades/friendFacade"
 import { IFriend } from "../interfaces/IFriend";
+import base64 from "base-64";
 const debug = require("debug")("friend-routes")
 
 let facade: FriendFacade;
@@ -33,6 +34,16 @@ router.post('/', async function (req, res, next) {
   }
 })
 
+router.post("/login", async (req, res, next) => {
+  const { userName, password } = req.body;
+  const user = await facade.getVerifiedUser(userName, password)
+  if (!user) {
+    return next(new ApiError("Failed to login", 400))
+  }
+  const base64AuthString = "Basic " + base64.encode(userName + ":" + password)
+  res.json({ base64AuthString, user: user.email, role: user.role})
+})
+
 // ALL ENDPOINTS BELOW REQUIRES AUTHENTICATION
 
 import authMiddleware from "../middleware/basic-auth"
@@ -43,7 +54,7 @@ if (USE_AUTHENTICATION) {
 }
 
 router.get("/all", async (req: any, res) => {
-  const friends = await facade.getAllFriends();
+  const friends = await facade.getAllFriendsV2();
 
   const friendsDTO = friends.map(friend => {
     const { firstName, lastName, email } = friend
@@ -79,7 +90,7 @@ router.get("/me", async (req: any, res, next) => {
       throw new ApiError("This endpoint requires authentication", 500)
     }
     const userName = req.credentials.userName; //GET THE USERS EMAIL FROM SOMEWHERE (req.params OR req.credentials.userName)
-    const friend = await facade.getFrind(userName);
+    const friend = await facade.getFriendFromEmail(userName);
     if (friend == null) {
       throw new ApiError("User not found", 404)
     }
@@ -102,7 +113,7 @@ router.get("/find-user/:email", async (req: any, res, next) => {
       throw new ApiError("Not Authorized", 401)
     }
     const userId = req.params.email;
-    const friend = await facade.getFrind(userId);
+    const friend = await facade.getFriendFromEmail(userId);
     if (friend == null) {
       throw new ApiError("user not found", 404)
     }
