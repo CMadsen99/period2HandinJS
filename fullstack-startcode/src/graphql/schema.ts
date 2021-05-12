@@ -15,6 +15,19 @@ const typeDefs = `
         email: String
         role: String
     }
+    type Position {
+        longitude: Float
+        latitude: Float
+    }
+    type Location {
+        type: String
+        coordinates: [Float]
+    }
+    type NearbyFriend {
+        email: String
+        name: String
+        location: Location
+    }
     """
     Queries available for Friends
     """
@@ -46,6 +59,11 @@ const typeDefs = `
         password: String
         email: String!
     }
+    input PositionInput {
+        email: String!
+        longitude: Float!
+        latitude: Float!
+    }
     type Mutation {
         """
         Allows anyone (non authenticated users) to create a new friend
@@ -55,6 +73,10 @@ const typeDefs = `
         editFriend(input: FriendEditInput): EditFriend
        
         deleteFriend(email: String): Boolean
+
+        addPosition(input: PositionInput): Boolean
+
+        findNearbyFriends(input: PositionInput, distance: Float): [NearbyFriend]!
     }
 `;
 

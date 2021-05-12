@@ -89,7 +89,7 @@ describe("### Describe the Friend Endpoints (/api/friends) ###", function () {
         const response = await request
         .get('/api/friends/find-user/xx@x.xx')
         .auth("aa@a.dk", "secret");
-        expect(response.status).to.equal(400);
+        expect(response.status).to.equal(404);
     })
 
     it("It should not let a non-admin user find Donald Duck", async () => {
